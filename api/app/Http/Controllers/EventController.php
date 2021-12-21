@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreEventRequest;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\EventDetails;
@@ -17,7 +18,43 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $data = [];
+
+
+            $head = Event::orderByDesc('id')
+                ->take(1)
+                ->get();
+            if (count($head) == 0) {
+                $response = [
+                    'data' => $data,
+                ];
+
+                return response($response, 200);
+            }
+
+            $details = EventDetails::where('event_id', $head[0]['id'])
+                ->get();
+
+            $data = array(
+                'head' => $head,
+                'details' => $details
+            );
+
+            $response = [
+                'data' => $data,
+            ];
+
+            return response($response, 200);
+        } catch (\Throwable $th) {
+            //throw $th;
+            error_log($th);
+            $response = [
+                'msg' => 'Encountered error on retrieving data, please try again!',
+            ];
+
+            return response($response, 400);
+        }
     }
 
     /**
@@ -26,24 +63,9 @@ class EventController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreEventRequest $fields)
     {
         try {
-
-            $fields =  $request->validate(
-                [
-                    'name' => 'required',
-                    'days' => 'required',
-                    'from_date' => 'required',
-                    'to_date' => 'required',
-                ],
-                [
-                    'name.required' => 'Please enter an event name!',
-                    'days.required' => 'Please enter a days!',
-                    'from_date.required' => 'Please enter start date!',
-                    'to_date.required' => 'Please enter end date!',
-                ]
-            );
 
             $from = Carbon::createFromFormat('Y-m-d', $fields['from_date']);
             $to = Carbon::createFromFormat('Y-m-d', $fields['to_date']);
@@ -78,9 +100,9 @@ class EventController extends Controller
             ];
 
             return response($response, 201);
-        } catch (\Exception $e) {
+        } catch (\Throwable $th) {
+            // error_log($th);
             DB::rollback();
-            // error_log($e);
             $response = [
                 'msg' => 'Error inserting the data!',
             ];

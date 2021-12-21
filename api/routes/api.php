@@ -15,6 +15,7 @@ use App\Http\Controllers\EventController;
 |
 */
 Route::post('/insert-event', [EventController::class, 'store']);
+Route::get('/get-event', [EventController::class, 'index']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
