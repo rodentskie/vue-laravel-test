@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventDetails;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class EventController extends Controller
 {
@@ -36,9 +37,24 @@ class EventController extends Controller
             $details = EventDetails::where('event_id', $head[0]['id'])
                 ->get();
 
+            $period = CarbonPeriod::create($details[0]['from_date'], $details[0]['to_date']);
+            $affected = [];
+
+            // Iterate over the period
+            foreach ($period as $date) {
+                $eventDays = $details[0]['days'];
+                $arr = explode(',', $eventDays);
+                $getDay = $date->englishDayOfWeek;
+                $bool = in_array($getDay, $arr);
+
+                if ($bool) array_push($affected, $date->format('Y-m-d'));
+            }
+
+
             $data = array(
                 'head' => $head,
-                'details' => $details
+                'details' => $details,
+                'affected' => $affected
             );
 
             $response = [
@@ -46,6 +62,10 @@ class EventController extends Controller
             ];
 
             return response($response, 200);
+
+            // $mytime = Carbon::now()
+            //     ->setTimezone('GMT+8');
+            // return response($mytime->toArray(), 200);
         } catch (\Throwable $th) {
             //throw $th;
             error_log($th);

@@ -26,13 +26,13 @@ class EventDayValidator implements Rule
     public function passes($attribute, $value)
     {
         $valid = [
-            'M',
-            'T',
-            'W',
-            'Th',
-            'F',
-            'S',
-            'Su',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
         ];
         $split = explode(',', $value);
         $check = true;
