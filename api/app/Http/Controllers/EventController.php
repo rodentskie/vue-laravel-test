@@ -52,8 +52,8 @@ class EventController extends Controller
 
 
             $data = array(
-                'head' => $head,
-                'details' => $details,
+                'head' => $head[0],
+                'details' => $details[0],
                 'affected' => $affected
             );
 
