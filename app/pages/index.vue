@@ -165,6 +165,13 @@ export default {
         await this.fetchEvents()
       } catch (e) {
         console.log('Error fetch: ', e)
+        if (e.response.data) {
+          this.showLoading = false
+          const error = e.response.data.errors
+          for (const er in error) {
+            this.showMessage(error[er], 'danger', 'Error')
+          }
+        }
       }
     },
     clearFields() {
